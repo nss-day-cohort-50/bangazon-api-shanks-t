@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from bangazon_api import serializers
 from bangazon_api.helpers import STATE_NAMES
 from bangazon_api.models import Product, Store, Category, Order, Rating, Recommendation
 from bangazon_api.serializers import (
@@ -328,7 +329,7 @@ class ProductView(ViewSet):
     def rate_product(self, request, pk):
         """Rate a product"""
         product = Product.objects.get(pk=pk)
-
+        
         try:
             rating = Rating.objects.get(
                 customer=request.auth.user, product=product)
@@ -340,5 +341,6 @@ class ProductView(ViewSet):
                 product=product,
                 score=request.data['score']
             )
+        
 
         return Response({'message': 'Rating added'}, status=status.HTTP_201_CREATED)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from bangazon_api.models.rating import Rating
 
 
 class Product(models.Model):
@@ -26,15 +27,16 @@ class Product(models.Model):
         Returns:
             number -- The average rating for the product
         """
+        ratings = Rating.objects.filter(product_id=self.id)
         # TODO: Fix Divide by zero error
         # The below code returns a divide by zero error uncomment and fix
 
-        # total_rating = 0
-        # for rating in self.ratings.all():
-        #     total_rating += rating.rating
-
-        # avg = total_rating / self.ratings.count()
-        # return avg
+        total_rating = 0
+        if ratings:
+            for rating in ratings:
+                total_rating += rating.score
+            avg = total_rating / len(ratings)
+        return avg
 
     def __str__(self):
         return self.name
