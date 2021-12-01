@@ -36,6 +36,7 @@ class Product(models.Model):
             for rating in ratings:
                 total_rating += rating.score
             avg = total_rating / len(ratings)
+        else: avg = 0
         return avg
 
     def __str__(self):
