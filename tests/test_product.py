@@ -75,3 +75,22 @@ class ProductTests(APITestCase):
         response = self.client.get('/api/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), Product.objects.count())
+
+def test_delete_product(self):
+        """
+        Ensure we can delete a product.
+        """
+
+
+        product = Product()
+        product.name = "Product"
+        product.price = 20
+        product.description = "Gooey"
+        product.quantity = 10
+        product.location = "Mississippi"
+        product.category = Category.objects.first()
+        product.save()
+
+        url = f"/api/products/{product.id}"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
