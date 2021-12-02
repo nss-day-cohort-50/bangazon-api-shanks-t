@@ -4,7 +4,7 @@ from django.db import connection
 from django.views import View
 
 
-from levelupreports.views.helpers import dict_fetch_all
+from bangazon_reports.views.helpers import dict_fetch_all
 
 class ExpensiveProductList(View):
     def get(self, request):
