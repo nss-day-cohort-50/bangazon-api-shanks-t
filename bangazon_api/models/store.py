@@ -6,6 +6,7 @@ class Store(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     is_active = models.BooleanField(default=True)
+    favorites = models.ManyToManyField(User, related_name='favorites', through="Favorite")
 
     def __str__(self):
         return self.name
