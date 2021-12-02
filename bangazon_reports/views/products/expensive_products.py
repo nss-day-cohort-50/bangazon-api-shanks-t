@@ -27,29 +27,15 @@ class ExpensiveProductList(View):
                         "name": row['name'], 
                         'store': row['store_id'], 
                         'description': row['description'], 
+                        "price": row['price'],
                         'location': row['location'], 
-                        'category': row['category']
+                        "StoreName": row['StoreName'],
+                        'category': row['category_id']
                 }
                 
        
-                
-                user_dict = next(
-                    (
-                        expensive_product for expensive_product in expensive_products
-                        if expensive_product['store_id'] == row['store_id']
-                    ),
-                    None
-                )
-                
-                if user_dict:
-                    user_dict['products'].append(product)
-                else:
-                    expensive_products.append({
-                        "user_id": row['user_id'],
-                        "full_name": row['full_name'],
-                        "products": [product]
-                    })
-        
+                expensive_products.append(product)
+    
         template = 'expensive_products.html'
         
         context = {
