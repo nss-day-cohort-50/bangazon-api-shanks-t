@@ -9,7 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from bangazon_api import serializers
 from bangazon_api.helpers import STATE_NAMES
-from bangazon_api.models import Product, Store, Category, Order, Rating, Recommendation
+from bangazon_api.models import Product, Store, Category, Order, Rating, Recommendation, Like
 from bangazon_api.serializers import (
     ProductSerializer, CreateProductSerializer, MessageSerializer,
     AddProductRatingSerializer, AddRemoveRecommendationSerializer)
@@ -156,6 +156,13 @@ class ProductView(ViewSet):
                 type=openapi.TYPE_INTEGER,
                 description="Get Products over a certain price"
             ),
+            openapi.Parameter(
+                "liked",
+                openapi.IN_QUERY,
+                required=False,
+                type=openapi.TYPE_BOOLEAN,
+                description="Get all the liked Products"
+            )
         ]
     )
     def list(self, request):
@@ -167,6 +174,8 @@ class ProductView(ViewSet):
         order = request.query_params.get('order_by', None)
         direction = request.query_params.get('direction', None)
         min_price = request.query_params.get('min_price', None)
+        location = request.query_params.get('location', None)
+        liked = request.query_params.get('liked', None)
 
         if number_sold:
             products = products.annotate(
@@ -182,6 +191,12 @@ class ProductView(ViewSet):
      
         if min_price is not None:
             products = products.filter(price__gte=min_price)
+
+        if location is not None:
+            products = products.filter(location__contains=location)
+
+        if liked is not None:
+            products = products.filter(liked__like=True)
 
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
@@ -302,7 +317,7 @@ class ProductView(ViewSet):
                 recommender=request.auth.user,
                 customer=customer
             )
-
+            
             return Response(None, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
@@ -312,6 +327,32 @@ class ProductView(ViewSet):
                 customer=customer
             )
             recommendation.delete()
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['post', 'delete'], detail=True)
+    def like(self, request, pk):
+        """Add or remove a recommendation for a product to another user"""
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.method == "POST":
+            like = Like.objects.create(
+                like=True,
+                product=product,
+                customer=request.auth.user
+            )
+
+            return Response(None, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            like = Like.objects.get(
+                product=product,
+                customer=request.auth.user
+            )
+            like.delete()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
 

@@ -1,6 +1,12 @@
 from rest_framework import serializers
-from bangazon_api.models import Product
+from bangazon_api.models import Product, Like
+
+# class LikedProductSerializer(serializers.Serializer):
+#     model = Like
+#     fields = ( 'like')
+
 class ProductSerializer(serializers.ModelSerializer):
+    #liked = LikedProductSerializer()
     class Meta:
         model = Product
         fields = ('id', 'name', 'price', 'description', 'average_rating', 'quantity', 'location', 'image_path', 'category', 'store')
@@ -20,3 +26,5 @@ class AddRemoveRecommendationSerializer(serializers.Serializer):
 
 class AddProductRatingSerializer(serializers.Serializer):
     score = serializers.IntegerField()
+
+
